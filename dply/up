@@ -1,0 +1,7 @@
+#!/bin/bash
+DIR_UP="$(dirname "$0")"/.up/
+export DEPLOY_OWNER=$("$DIR_UP"/.DAC/sourceowner.sh)
+export DEPLOY_GROUP=$("$DIR_UP"/.DAC/sourcegroup.sh)
+COMPOSE_PROJECT_NAME="$("$DIR_UP"/.project/composeNameGet.sh up)"
+export TRACE_SERVICE_PORT="$("$DIR_UP"/.port/trace/get.sh)"
+"$DIR_UP"/.docker/compose/docker-compose --project-name="$COMPOSE_PROJECT_NAME" --project-directory="$DIR_UP" up --detach "$@"

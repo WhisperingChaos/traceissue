@@ -1,0 +1,18 @@
+{
+    "update.channel": "none",
+    "update.mode": "manual",
+    "extensions.autoUpdate" : false,
+    "terminal.integrated.shell.linux": "/bin/bash",
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 60000,
+    "extensions.autoCheckUpdates": false,
+    "terminal.integrated.gpuAcceleration": "off",
+    "remote.autoForwardPorts": false,
+    "security.workspace.trust.enabled": false,
+    "security.workspace.trust.emptyWindow": false,
+    "security.workspace.trust.banner": "never",
+    "security.workspace.trust.startupPrompt": "never",
+    "workbench.welcomePage.walkthroughs.openOnInstall": false,
+    "workbench.startupEditor": "none",
+    "gitlens.showWelcomeScreen": false,
+}

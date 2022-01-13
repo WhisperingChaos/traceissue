@@ -1,0 +1,5 @@
+#!/bin/bash
+DIR_BUILD="$(dirname "$0")"/.build/
+export PROJECT_FILES_OWNER="$("$DIR_BUILD"/.DAC/sourceowner.sh)"
+export PROJECT_FILES_GROUP="$("$DIR_BUILD"/.DAC/sourcegroup.sh)"
+"$DIR_BUILD"/.docker/compose/docker-compose  --project-directory="$DIR_BUILD"  --file="$DIR_BUILD"/build.yml build  "$@"

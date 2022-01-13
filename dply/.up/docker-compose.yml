@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  fanin:
+    image: fanin
+    command: /fanin
+    environment:
+        TRACE_SERVICE_PORT: ${TRACE_SERVICE_PORT}
+  trace:
+    image: trace
+    stdin_open: true
+    tty: true
+    environment:
+        TRACE_SERVICE_NAME: fanin
+        TRACE_SERVICE_PORT: ${TRACE_SERVICE_PORT}
+        TRACE_INTERVAL: ${TRACE_INTERVAL:-10}
+    depends_on:
+    - fanin
+  chrome:
+    image: chrome
+    depends_on:
+     - trace
+    shm_size: 1gb
+    entrypoint: ["google-chrome", "--no-sandbox", "--enable-blink-features=ShadowDOMV0,CustomElementsV0,HTMLImports"]
+    environment:
+      DISPLAY: unix$DISPLAY
+    volumes:
+    - type: bind
+      source: /tmp/.X11-unix
+      target: /tmp/.X11-unix

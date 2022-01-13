@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  gocompiler:
+    image: gocompiler
+    user: "${SOURCE_OWNER}:${SOURCE_GROUP}"
+    volumes:
+      - type: bind
+        source: ./service/gocompiler/up/src
+        target: /home/user/src
+      - type: bind
+        source: ./service/fanin/context/
+        target: /home/user/exec/out/

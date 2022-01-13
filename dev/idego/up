@@ -1,0 +1,4 @@
+#!/bin/bash
+DIR_UP="$(dirname "$0")"/.up/
+COMPOSE_PROJECT_NAME="$("$DIR_UP"/.project/composeNameGet.sh devup)"
+"$DIR_UP"/.docker/compose/docker-compose  --project-directory="$DIR_UP"  --project-name="$COMPOSE_PROJECT_NAME"  up  --detach "$@"

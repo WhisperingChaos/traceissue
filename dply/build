@@ -1,0 +1,46 @@
+#!/bin/bash
+set -e
+
+compiler_wait(){
+    local -r projectName="$1"
+    local -r freqDivision=100
+    local -r waitMaxSec=$2*freqDivision
+
+    # relies on fractional second support by sleep
+    local -r sleepIntervalSpec=0$(eval echo "'scale=2; 1/$freqDivision'" | bc)s
+    for ((i = 0 ; i < waitMaxSec ; i++)); do
+        sleep $sleepIntervalSpec
+        if "$COMPOSE"  --project-directory="$DIR_BUILD"/  --project-name="$COMPOSE_PROJECT_NAME"  --file="$DIR_BUILD"/phase_2.yml ps --status exited | grep -E "${projectName}.+gocompiler.+exited" >/dev/null 2>/dev/null; then
+            return 
+        fi
+    done
+    echo Error: gocompile service should have completed by now. >&2
+    return 1
+}
+
+DIR_BUILD="$(dirname $0)"/.build/
+COMPOSEe_PROJECT_NAME="$("$DIR_BUILD"/.project/composeNameGet.sh build)"
+COMPOSE="$DIR_BUILD"/.docker/compose/docker-compose
+"$COMPOSE"  --project-directory="$DIR_BUILD"/  --project-name="$COMPOSE_PROJECT_NAME"  --file="$DIR_BUILD"/phase_1.yml  build  "$@"
+# Create subshell to delineate scope of compiler permissions: SOURCE_OWNER, SOURCE_GROUP.  Prevents complecting these variables with other ones used by the script.
+(
+# go compile is excuted by a running container :: compiler must have the permissions needed to access the source files.
+export SOURCE_OWNER=$("$DIR_BUILD"/.DAC/sourceowner.sh)
+export SOURCE_GROUP=$("$DIR_BUILD"/.DAC/sourcegroup.sh)
+# first, if it exists, cleanup a failed compile 
+if ! "$COMPOSE"  --project-directory="$DIR_BUILD"/  --project-name="$COMPOSE_PROJECT_NAME"  --file="$DIR_BUILD"/phase_2.yml down >/dev/null 2>/dev/null; then
+    true
+fi
+# compile
+"$COMPOSE"  --project-directory="$DIR_BUILD"/  --project-name="$COMPOSE_PROJECT_NAME"  --file="$DIR_BUILD"/phase_2.yml up
+
+# wait at most 30 seconds for compile to complete
+compiler_wait "$COMPOSE_PROJECT_NAME" 30
+
+if ! "$COMPOSE"  --project-directory="$DIR_BUILD"/  --project-name="$COMPOSE_PROJECT_NAME"  --file="$DIR_BUILD"/phase_2.yml ps --status exited | grep -E "$COMPOSE_PROJECT_NAME.+gocompiler.+exited.*\(0\)" >/dev/null; then
+    exit 1
+fi
+
+"$COMPOSE"  --project-directory="$DIR_BUILD"/  --project-name="$COMPOSE_PROJECT_NAME"  --file="$DIR_BUILD"/phase_2.yml down
+)
+"$COMPOSE"  --project-directory="$DIR_BUILD"/  --project-name="$COMPOSE_PROJECT_NAME"  --file="$DIR_BUILD"/phase_3.yml build "$@"

@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  idebase:
+    image: idebase
+  idego:
+    image: idego
+  gocompiler:
+    image: gocompiler
+    build:
+      context: ./service/gocompiler/context
+    depends_on:
+    - idego
+  trace:
+    image: trace
+    build:
+      context: ./service/trace/context
+    depends_on:
+    - gocompiler
+  chrome:
+    image: chrome
+    build:
+      context: ./service/chrome/context/
+    depends_on:
+    - idebase

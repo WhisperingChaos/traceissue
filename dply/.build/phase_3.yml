@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  gocompiler:
+    image: gocompiler
+  fanin:
+    image: fanin
+    build:
+      context: ./service/fanin/context
+    depends_on:
+    - gocompiler
