@@ -1,4 +1,12 @@
 #!/bin/bash
+set -e
+# hack due to docker compose issue in older experimental docker client/engine that I'm using see:https://github.com/docker/compose/issues/8449
+ROOT_IMAGE_NAME='debian:9.4'
+ROOT_IMAGE_HASH=$(docker image ls -q $ROOT_IMAGE_NAME)
+if [[ -z "$ROOT_IMAGE_HASH" ]]; then
+	docker pull $ROOT_IMAGE_NAME
+fi
+
 DIR_BUILD="$(dirname "$0")"/.build/
 export PROJECT_FILES_OWNER="$("$DIR_BUILD"/.DAC/sourceowner.sh)"
 export PROJECT_FILES_GROUP="$("$DIR_BUILD"/.DAC/sourcegroup.sh)"
