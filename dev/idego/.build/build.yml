@@ -1,5 +1,7 @@
 version: "3.9"
 services:
+  base:
+    image: debian:9.4
   idebase:
     image: idebase
     build:
@@ -9,6 +11,8 @@ services:
         PKG_NAME_VER_VSCODE: code=1.60.2-1632313585
         ACCOUNT_VSCODE_OWNER_ID: ${PROJECT_FILES_OWNER}
         ACCOUNT_VSCODE_GROUP_ID: ${PROJECT_FILES_GROUP}
+    depends_on:
+    - base
   idego:
     image: idego
     build:
